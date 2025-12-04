@@ -1,53 +1,133 @@
-@media (prefers-color-scheme: light) {
-  a:hover {
-    color: #61dafb;
-  }
+.popup {
+  width: 280px;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-main {
-  text-align: center;
-  padding: 1em;
-  margin: 0 auto;
+.title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
-h3 {
-  color: #61dafb;
-  text-transform: uppercase;
-  font-size: 1.5rem;
-  font-weight: 200;
-  line-height: 1.2rem;
-  margin: 2rem auto;
+.error {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 12px;
 }
 
-.calc {
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.btn {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-record {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-record:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-stop {
+  background: #374151;
+  color: white;
+}
+
+.btn-stop:hover {
+  background: #1f2937;
+}
+
+.btn-secondary {
+  background: #6366f1;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4f46e5;
+}
+
+.recording-indicator {
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 2rem;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 0;
+}
 
-  & > button {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid #61dafb;
-    border-radius: 0.25rem;
-    background-color: transparent;
-    color: #61dafb;
-    cursor: pointer;
-    outline: none;
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
 
-    width: 3rem;
-    margin: 0 a;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
-
-  & > label {
-    font-size: 1.5rem;
-    margin: 0 1rem;
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
   }
 }
 
-a {
-  font-size: 0.5rem;
-  margin: 0.5rem;
-  color: #cccccc;
-  text-decoration: none;
+.recording-time {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+}
+
+.hint {
+  font-size: 11px;
+  color: #6b7280;
+  text-align: center;
+  margin: 12px 0 0 0;
 }
