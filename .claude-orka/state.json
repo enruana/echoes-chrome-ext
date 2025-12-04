@@ -8,14 +8,26 @@
       "tmuxSessionId": "orka-a4ee8bff-e7db-4772-88d2-222d0238e4b4",
       "status": "active",
       "createdAt": "2025-12-04T11:00:45.137Z",
-      "lastActivity": "2025-12-04T11:00:45.137Z",
+      "lastActivity": "2025-12-04T19:00:31.942Z",
       "main": {
         "claudeSessionId": "8d6d3e7f-b3c2-4268-a8ee-e47709086492",
         "tmuxPaneId": "%2",
         "status": "active"
       },
-      "forks": []
+      "forks": [
+        {
+          "id": "a68912ca-0fe5-4ac6-8e0c-f3b813167545",
+          "name": "ai-processing-audio",
+          "parentId": "main",
+          "claudeSessionId": "5657a161-d65e-49d4-8936-5ed1fbf8772f",
+          "status": "merged",
+          "createdAt": "2025-12-04T14:22:32.973Z",
+          "contextPath": ".claude-orka/exports/fork-ai-processing-audio-2025-12-04T18-09-06-216Z.md",
+          "mergedToMain": true,
+          "mergedAt": "2025-12-04T19:00:31.874Z"
+        }
+      ]
     }
   ],
-  "lastUpdated": "2025-12-04T11:00:45.141Z"
+  "lastUpdated": "2025-12-04T19:00:31.942Z"
 }
