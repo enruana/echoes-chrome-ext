@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { saveRecording } from '../utils/storage'
 
 type CaptureMode = 'tab' | 'mic' | 'both'
 
@@ -141,7 +142,7 @@ export const Recorder = () => {
     }
   }
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     const mediaRecorder = mediaRecorderRef.current
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop()
@@ -159,25 +160,27 @@ export const Recorder = () => {
       audioContextRef.current = null
     }
 
-    // Download recording
-    setTimeout(() => {
+    // Save recording to IndexedDB
+    setTimeout(async () => {
       const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
 
       if (blob.size > 0) {
-        const url = URL.createObjectURL(blob)
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `recording-${timestamp}.webm`
-        a.click()
-        URL.revokeObjectURL(url)
+        try {
+          await saveRecording(blob, duration)
+          setStatus('stopped')
+        } catch (err) {
+          setError('Failed to save recording')
+          setStatus('stopped')
+        }
+      } else {
+        setStatus('stopped')
       }
-
-      setStatus('stopped')
-
-      // Close window after a short delay
-      setTimeout(() => window.close(), 500)
     }, 100)
+  }
+
+  const openRecordings = () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('recordings.html') })
+    window.close()
   }
 
   const formatDuration = (seconds: number): string => {
@@ -244,7 +247,24 @@ export const Recorder = () => {
       )}
 
       {status === 'stopped' && !error && (
-        <div style={{ color: '#22c55e' }}>Recording saved!</div>
+        <div>
+          <div style={{ color: '#22c55e', marginBottom: 16 }}>Recording saved!</div>
+          <button
+            onClick={openRecordings}
+            style={{
+              padding: '10px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+              background: '#6366f1',
+              color: 'white',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
+            }}
+          >
+            View Recordings
+          </button>
+        </div>
       )}
 
       {error && (

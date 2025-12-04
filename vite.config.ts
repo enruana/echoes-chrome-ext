@@ -14,6 +14,7 @@ export default defineConfig(() => {
       rollupOptions: {
         input: {
           recorder: resolve(__dirname, 'recorder.html'),
+          recordings: resolve(__dirname, 'recordings.html'),
         },
         output: {
           chunkFileNames: 'assets/chunk-[hash].js',

@@ -140,13 +140,22 @@ export const Popup = () => {
     <main className="popup">
       <div className="header">
         <h1 className="title">Echoes</h1>
-        <button
-          onClick={() => chrome.runtime.openOptionsPage()}
-          className="settings-btn"
-          title="Settings"
-        >
-          ⚙️
-        </button>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button
+            onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL('recordings.html') })}
+            className="settings-btn"
+            title="Recordings"
+          >
+            📁
+          </button>
+          <button
+            onClick={() => chrome.runtime.openOptionsPage()}
+            className="settings-btn"
+            title="Settings"
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
 
       <div className="platform-badge">
