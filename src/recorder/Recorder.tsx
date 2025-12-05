@@ -9,15 +9,20 @@ interface RecorderParams {
   tabId: number
 }
 
+const NUM_BARS = 5
+
 export const Recorder = () => {
   const [status, setStatus] = useState<'starting' | 'recording' | 'stopped'>('starting')
   const [duration, setDuration] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [audioLevels, setAudioLevels] = useState<number[]>(new Array(NUM_BARS).fill(0))
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
+  const analyserRef = useRef<AnalyserNode | null>(null)
+  const animationRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
 
   // Get params from URL
@@ -49,6 +54,43 @@ export const Recorder = () => {
     }, 1000)
     return () => clearInterval(interval)
   }, [status])
+
+  // Audio visualization
+  const updateAudioLevels = () => {
+    if (!analyserRef.current) return
+
+    const analyser = analyserRef.current
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    analyser.getByteFrequencyData(dataArray)
+
+    // Sample frequencies across the spectrum for each bar
+    const levels: number[] = []
+    const step = Math.floor(dataArray.length / NUM_BARS)
+
+    for (let i = 0; i < NUM_BARS; i++) {
+      const start = i * step
+      const end = start + step
+      let sum = 0
+      for (let j = start; j < end; j++) {
+        sum += dataArray[j]
+      }
+      const avg = sum / step
+      // Normalize to 0-1 range with some smoothing
+      levels.push(Math.min(1, avg / 180))
+    }
+
+    setAudioLevels(levels)
+    animationRef.current = requestAnimationFrame(updateAudioLevels)
+  }
+
+  const setupAnalyser = (audioContext: AudioContext, source: AudioNode) => {
+    const analyser = audioContext.createAnalyser()
+    analyser.fftSize = 256
+    analyser.smoothingTimeConstant = 0.7
+    source.connect(analyser)
+    analyserRef.current = analyser
+    updateAudioLevels()
+  }
 
   const startRecording = async (params: RecorderParams) => {
     try {
@@ -90,12 +132,22 @@ export const Recorder = () => {
           const audioContext = new AudioContext()
           const destination = audioContext.createMediaStreamDestination()
 
+          // Create a merger gain node for visualization
+          const merger = audioContext.createGain()
+
           const tabSource = audioContext.createMediaStreamSource(tabStream)
           const micSource = audioContext.createMediaStreamSource(micStream)
 
-          tabSource.connect(destination)
+          // Connect sources to merger for visualization
+          tabSource.connect(merger)
+          micSource.connect(merger)
+
+          // Connect merger to destination and speakers
+          merger.connect(destination)
           tabSource.connect(audioContext.destination)
-          micSource.connect(destination)
+
+          // Setup analyser on the merger for visualization
+          setupAnalyser(audioContext, merger)
 
           audioContextRef.current = audioContext
           finalStream = destination.stream
@@ -107,6 +159,10 @@ export const Recorder = () => {
           const audioContext = new AudioContext()
           const source = audioContext.createMediaStreamSource(tabStream)
           source.connect(audioContext.destination)
+
+          // Setup analyser for visualization
+          setupAnalyser(audioContext, source)
+
           audioContextRef.current = audioContext
           finalStream = tabStream
           streamRef.current = tabStream
@@ -116,6 +172,13 @@ export const Recorder = () => {
         finalStream = await navigator.mediaDevices.getUserMedia({
           audio: { deviceId: { exact: params.deviceId } }
         })
+
+        // Setup analyser for mic
+        const audioContext = new AudioContext()
+        const source = audioContext.createMediaStreamSource(finalStream)
+        setupAnalyser(audioContext, source)
+        audioContextRef.current = audioContext
+
         streamRef.current = finalStream
       }
 
@@ -143,6 +206,14 @@ export const Recorder = () => {
   }
 
   const stopRecording = async () => {
+    // Stop animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+      animationRef.current = null
+    }
+    analyserRef.current = null
+    setAudioLevels(new Array(NUM_BARS).fill(0))
+
     const mediaRecorder = mediaRecorderRef.current
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop()
@@ -226,6 +297,29 @@ export const Recorder = () => {
             }}>
               {formatDuration(duration)}
             </span>
+          </div>
+
+          {/* Audio visualization bars */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            gap: 4,
+            height: 32,
+            marginBottom: 20,
+          }}>
+            {audioLevels.map((level, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 4,
+                  height: `${Math.max(4, level * 32)}px`,
+                  background: '#6366f1',
+                  borderRadius: 2,
+                  transition: 'height 0.05s ease-out',
+                }}
+              />
+            ))}
           </div>
 
           <button

@@ -32,6 +32,7 @@ export const Recordings = () => {
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [selectedRecording, setSelectedRecording] = useState<Recording | null>(null)
   const [importing, setImporting] = useState(false)
+  const [copied, setCopied] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -191,6 +192,17 @@ export const Recordings = () => {
     URL.revokeObjectURL(url)
   }
 
+  const handleCopyTranscript = async (recording: Recording) => {
+    if (!recording.transcription) return
+    try {
+      await navigator.clipboard.writeText(recording.transcription)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
   const formatDate = (timestamp: number): string => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       month: 'short',
@@ -302,12 +314,22 @@ export const Recordings = () => {
               <div className="detail-header">
                 <h2>{selectedRecording.name}</h2>
                 {selectedRecording.transcription && (
-                  <button
-                    onClick={() => handleDownloadTranscript(selectedRecording)}
-                    className="btn btn-secondary"
-                  >
-                    Download Transcript
-                  </button>
+                  <div className="detail-actions">
+                    <button
+                      onClick={() => handleCopyTranscript(selectedRecording)}
+                      className="btn btn-secondary"
+                      title="Copy to clipboard"
+                    >
+                      {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                    <button
+                      onClick={() => handleDownloadTranscript(selectedRecording)}
+                      className="btn btn-secondary"
+                      title="Download as markdown file"
+                    >
+                      Download
+                    </button>
+                  </div>
                 )}
               </div>
               {selectedRecording.transcription ? (

@@ -8,10 +8,10 @@
       "tmuxSessionId": "orka-a4ee8bff-e7db-4772-88d2-222d0238e4b4",
       "status": "active",
       "createdAt": "2025-12-04T11:00:45.137Z",
-      "lastActivity": "2025-12-04T19:00:31.942Z",
+      "lastActivity": "2025-12-05T11:03:39.041Z",
       "main": {
         "claudeSessionId": "8d6d3e7f-b3c2-4268-a8ee-e47709086492",
-        "tmuxPaneId": "%2",
+        "tmuxPaneId": "%0",
         "status": "active"
       },
       "forks": [
@@ -29,5 +29,5 @@
       ]
     }
   ],
-  "lastUpdated": "2025-12-04T19:00:31.942Z"
+  "lastUpdated": "2025-12-05T11:03:39.043Z"
 }

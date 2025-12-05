@@ -231,6 +231,11 @@
   color: #1a1a1a;
 }
 
+.detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .transcript-content {
   background: #f9fafb;
   border-radius: 8px;

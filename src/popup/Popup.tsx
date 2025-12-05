@@ -119,23 +119,6 @@ export const Popup = () => {
     )
   }
 
-  // Show unsupported page message
-  if (!currentPlatform) {
-    return (
-      <main className="popup">
-        <h1 className="title">Echoes</h1>
-        <div className="unsupported">
-          <p>Navigate to a meeting to start recording:</p>
-          <ul>
-            <li>Google Meet</li>
-            <li>Microsoft Teams</li>
-            <li>Zoom</li>
-          </ul>
-        </div>
-      </main>
-    )
-  }
-
   return (
     <main className="popup">
       <div className="header">
@@ -158,58 +141,71 @@ export const Popup = () => {
         </div>
       </div>
 
-      <div className="platform-badge">
-        {currentPlatform.name}
-      </div>
-
-      <div className="form-group">
-        <label>Capture Mode</label>
-        <select
-          value={captureMode}
-          onChange={(e) => setCaptureMode(e.target.value as CaptureMode)}
-        >
-          <option value="tab">Tab Audio Only</option>
-          <option value="mic">Microphone Only</option>
-          <option value="both">Tab + Microphone</option>
-        </select>
-      </div>
-
-      {(captureMode === 'mic' || captureMode === 'both') && (
-        <div className="form-group">
-          {micPermission !== 'granted' ? (
-            <button
-              onClick={() => chrome.runtime.openOptionsPage()}
-              className="btn btn-secondary"
-            >
-              Setup Microphone
-            </button>
-          ) : (
-            <>
-              <label>Microphone</label>
-              <select
-                value={selectedDevice}
-                onChange={(e) => setSelectedDevice(e.target.value)}
-              >
-                {audioDevices.map(d => (
-                  <option key={d.deviceId} value={d.deviceId}>{d.label}</option>
-                ))}
-              </select>
-            </>
-          )}
+      {!currentPlatform ? (
+        <div className="unsupported">
+          <p>Navigate to a meeting to start recording:</p>
+          <ul>
+            <li>Google Meet</li>
+            <li>Microsoft Teams</li>
+            <li>Zoom</li>
+          </ul>
         </div>
+      ) : (
+        <>
+          <div className="platform-badge">
+            {currentPlatform.name}
+          </div>
+
+          <div className="form-group">
+            <label>Capture Mode</label>
+            <select
+              value={captureMode}
+              onChange={(e) => setCaptureMode(e.target.value as CaptureMode)}
+            >
+              <option value="tab">Tab Audio Only</option>
+              <option value="mic">Microphone Only</option>
+              <option value="both">Tab + Microphone</option>
+            </select>
+          </div>
+
+          {(captureMode === 'mic' || captureMode === 'both') && (
+            <div className="form-group">
+              {micPermission !== 'granted' ? (
+                <button
+                  onClick={() => chrome.runtime.openOptionsPage()}
+                  className="btn btn-secondary"
+                >
+                  Setup Microphone
+                </button>
+              ) : (
+                <>
+                  <label>Microphone</label>
+                  <select
+                    value={selectedDevice}
+                    onChange={(e) => setSelectedDevice(e.target.value)}
+                  >
+                    {audioDevices.map(d => (
+                      <option key={d.deviceId} value={d.deviceId}>{d.label}</option>
+                    ))}
+                  </select>
+                </>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={startRecording}
+            disabled={needsMicPermission || isStarting}
+            className="btn btn-record"
+          >
+            {isStarting ? 'Starting...' : 'Start Recording'}
+          </button>
+
+          <p className="hint">
+            A small window will open to control the recording
+          </p>
+        </>
       )}
-
-      <button
-        onClick={startRecording}
-        disabled={needsMicPermission || isStarting}
-        className="btn btn-record"
-      >
-        {isStarting ? 'Starting...' : 'Start Recording'}
-      </button>
-
-      <p className="hint">
-        A small window will open to control the recording
-      </p>
     </main>
   )
 }
