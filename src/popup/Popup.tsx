@@ -92,7 +92,7 @@ export const Popup = () => {
         url: `recorder.html?${params.toString()}`,
         type: 'popup',
         width: 300,
-        height: 180,
+        height: 240,
         top: 100,
         left: 100,
         focused: true,
