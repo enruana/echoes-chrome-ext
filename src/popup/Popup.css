@@ -186,3 +186,32 @@
   border-radius: 12px;
   margin-bottom: 12px;
 }
+
+.version-info {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+.server-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.server-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.server-status.online::before {
+  background: #22c55e;
+}

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import './Popup.css'
 
+const EXTENSION_VERSION = '0.0.5'
+const SERVER_API_URL = 'http://127.0.0.1:8765'
+
 interface AudioDevice {
   deviceId: string
   label: string
@@ -25,11 +28,26 @@ export const Popup = () => {
   const [isStarting, setIsStarting] = useState(false)
   const [currentPlatform, setCurrentPlatform] = useState<{ name: string; platform: Platform } | null>(null)
   const [isCheckingTab, setIsCheckingTab] = useState(true)
+  const [serverStatus, setServerStatus] = useState<{ online: boolean; version?: string }>({ online: false })
 
   useEffect(() => {
     checkCurrentTab()
     checkPermissionAndLoadDevices()
+    checkServerStatus()
   }, [])
+
+  const checkServerStatus = async () => {
+    try {
+      const response = await fetch(`${SERVER_API_URL}/health`, { method: 'GET' })
+      const data = await response.json()
+      setServerStatus({
+        online: data.status === 'ok',
+        version: data.version || '0.1.0'
+      })
+    } catch {
+      setServerStatus({ online: false })
+    }
+  }
 
   const checkCurrentTab = async () => {
     try {
@@ -206,6 +224,13 @@ export const Popup = () => {
           </p>
         </>
       )}
+
+      <div className="version-info">
+        <span>ext v{EXTENSION_VERSION}</span>
+        <span className={`server-status ${serverStatus.online ? 'online' : 'offline'}`}>
+          server {serverStatus.online ? `v${serverStatus.version}` : 'offline'}
+        </span>
+      </div>
     </main>
   )
 }

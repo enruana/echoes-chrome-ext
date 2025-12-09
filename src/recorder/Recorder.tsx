@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { saveRecording } from '../utils/storage'
+import { saveRecording, generateRecordingName } from '../utils/storage'
 
 type CaptureMode = 'tab' | 'mic' | 'both'
 
@@ -215,9 +215,16 @@ export const Recorder = () => {
     setAudioLevels(new Array(NUM_BARS).fill(0))
 
     const mediaRecorder = mediaRecorderRef.current
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop()
-    }
+
+    // Wait for MediaRecorder to fully stop and collect all data
+    await new Promise<void>((resolve) => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.onstop = () => resolve()
+        mediaRecorder.stop()
+      } else {
+        resolve()
+      }
+    })
 
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop())
@@ -231,22 +238,38 @@ export const Recorder = () => {
       audioContextRef.current = null
     }
 
-    // Save recording to IndexedDB
-    setTimeout(async () => {
-      const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+    // Create blob from all chunks
+    const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+    const recordingName = generateRecordingName()
+    const filename = `${recordingName}.webm`
 
-      if (blob.size > 0) {
-        try {
-          await saveRecording(blob, duration)
-          setStatus('stopped')
-        } catch (err) {
-          setError('Failed to save recording')
-          setStatus('stopped')
-        }
-      } else {
-        setStatus('stopped')
-      }
-    }, 100)
+    if (blob.size === 0) {
+      setError('Recording is empty')
+      setStatus('stopped')
+      return
+    }
+
+    // FIRST: Download to Downloads folder using anchor element
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    // Don't revoke URL yet - let download complete
+
+    // THEN: Also save to IndexedDB for in-app access (with same name)
+    try {
+      await saveRecording(blob, duration, recordingName)
+    } catch (err) {
+      console.error('Failed to save to IndexedDB:', err)
+    }
+
+    // Clean up URL after a delay
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+    setStatus('stopped')
   }
 
   const openRecordings = () => {

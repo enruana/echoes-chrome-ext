@@ -40,14 +40,18 @@ const openDB = (): Promise<IDBDatabase> => {
   })
 }
 
+export const generateRecordingName = (): string => {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+  return `echoes-${timestamp}`
+}
+
 export const saveRecording = async (blob: Blob, duration: number, customName?: string): Promise<Recording> => {
   const database = await openDB()
   const id = `rec-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
 
   const recording: Recording = {
     id,
-    name: customName || `Recording ${timestamp}`,
+    name: customName || generateRecordingName(),
     blob,
     duration,
     createdAt: Date.now(),
