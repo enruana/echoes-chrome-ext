@@ -4,7 +4,7 @@ A Chrome extension for recording audio from online meetings and transcribing the
 
 ## Download
 
-**[Download Latest Release (v0.0.1)](https://github.com/enruana/echoes-chrome-ext/releases/download/v0.0.1/echoes-0.0.1.zip)**
+**[Download Latest Release (v0.0.5)](https://github.com/enruana/echoes-chrome-ext/releases/download/v0.0.5/echoes-0.0.5.zip)**
 
 ## Features
 
@@ -26,7 +26,7 @@ A Chrome extension for recording audio from online meetings and transcribing the
 
 ### From Release (Recommended)
 
-1. Download [`echoes-0.0.1.zip`](https://github.com/enruana/echoes-chrome-ext/releases/download/v0.0.1/echoes-0.0.1.zip)
+1. Download [`echoes-0.0.5.zip`](https://github.com/enruana/echoes-chrome-ext/releases/download/v0.0.5/echoes-0.0.5.zip)
 2. Extract the ZIP file
 3. Open Chrome and go to `chrome://extensions/`
 4. Enable **Developer mode** (toggle in top right)
